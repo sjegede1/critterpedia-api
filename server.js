@@ -2,6 +2,7 @@
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
+const cors = require('cors')
 
 require("dotenv").config()
 
@@ -13,6 +14,7 @@ app.use(
     })
 );
 app.use(express.static("public"));
+app.use(cors());
 
 // ======== MONGODB AND MODELS ===========
 mongoose.connect(process.env.MONGO_URI, {
@@ -27,12 +29,6 @@ mongoose.connection.once("open", () => {
 const Fish = require("./models/fish");
 const Insect = require("./models/insect");
 const SeaCreature = require("./models/sea-creature");
-
-
-// ========= ROUTES ============
-app.get("/", (req, res) => {
-    res.render("index")
-})
 
 // ========= SEED ROUTES ===========
 app.get("/seed/fish", async (req, res) => {
@@ -69,6 +65,17 @@ app.get("/seed/sea-creatures", async (req, res) => {
 })
 
 // ========= GET ROUTES ===========
+
+app.get("/show", async (req, res) => {
+    try {
+        let seaCreatures = await SeaCreature.find({})//.map((seaCreature) => [seaCreature.Name, seaCreature.Category])
+        let fish = await Fish.find({})//.map((fish) => [fish.Name, fish.Category])
+        let insects = await Insect.find({})//.map((insect) => [insect.Name, insect.Category])
+        res.json([...seaCreatures.map((creature) => [creature.Name, creature.Category]), ...fish.map((fish) => [fish.Name, fish.Category]), ...insects.map((insect) => [insect.Name, insect.Category])])
+    } catch (error) {
+        console.error(error)
+    }
+})
 
 app.get("/all", async (req, res) => {
     let seaCreature = await SeaCreature.find({})
@@ -107,6 +114,11 @@ app.get("/sea-creatures", async (req, res) => {
     } catch (error) {
         console.error(error)
     }
+})
+
+// ========= GENERIC ROUTES ============
+app.get("/*", (req, res) => {
+    res.render("index")
 })
 
 // ========== LISTENING ===========
