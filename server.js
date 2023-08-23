@@ -15,6 +15,7 @@ app.use(
 );
 app.use(express.static("public"));
 app.use(cors());
+app.set("view engine", "html");
 
 // ======== MONGODB AND MODELS ===========
 mongoose.connect(process.env.MONGO_URI, {
@@ -29,6 +30,12 @@ mongoose.connection.once("open", () => {
 const Fish = require("./models/fish");
 const Insect = require("./models/insect");
 const SeaCreature = require("./models/sea-creature");
+
+// ======= DEBUG ROUTES ===========
+app.get("/*", (req, res, next) => {
+    console.log("Routes Working 👍")
+    next()
+})
 
 // ========= SEED ROUTES ===========
 app.get("/seed/fish", async (req, res) => {
@@ -118,7 +125,12 @@ app.get("/sea-creatures", async (req, res) => {
 
 // ========= GENERIC ROUTES ============
 app.get("/*", (req, res) => {
-    res.render("index")
+    try {
+        res.render("index")
+    }
+    catch (error) {
+        console.error('Cannot render index.html:', error)
+    }
 })
 
 // ========== LISTENING ===========
