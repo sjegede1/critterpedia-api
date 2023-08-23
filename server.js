@@ -126,3 +126,6 @@ const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Now hosted locally at http://localhost:${PORT}`)
 })
+
+// ========== EXPORTS APP =======
+module.exports = app;
